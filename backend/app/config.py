@@ -18,18 +18,18 @@ class Settings(BaseSettings):
     gcs_bucket: str = "zettelcognee-files"
     gcs_credentials_path: str | None = None
 
-    # Cognee / LLM
-    llm_provider: str = "gemini"
-    llm_model: str = "gemini/gemini-2.0-flash"
+    # Cognee / LLM — Anthropic Claude
+    llm_provider: str = "anthropic"
+    llm_model: str = "claude-sonnet-4-20250514"
     llm_api_key: str = ""
 
-    embedding_provider: str = "gemini"
-    embedding_model: str = "models/text-embedding-004"
+    # Embeddings — fastembed (local, no API key)
+    embedding_provider: str = "fastembed"
+    embedding_model: str = "BAAI/bge-small-en-v1.5"
     embedding_api_key: str = ""
 
-    # Claude (for high-quality generation)
+    # Anthropic API key (used for both Cognee LLM and direct generation)
     anthropic_api_key: str = ""
-    anthropic_model: str = "claude-sonnet-4-20250514"
 
     # Auth
     jwt_algorithm: str = "HS256"

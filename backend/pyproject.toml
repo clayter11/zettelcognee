@@ -26,7 +26,8 @@ dependencies = [
     "redis>=5",
     # LLM providers
     "anthropic",
-    "google-generativeai",
+    # Embeddings (local)
+    "fastembed>=0.4",
     # Utils
     "httpx>=0.28",
 ]

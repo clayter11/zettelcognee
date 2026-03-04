@@ -1,4 +1,4 @@
-"""Document classifier — determines document type using Gemini Flash.
+"""Document classifier — determines document type using Claude.
 
 Classifies incoming documents into types (proposal, contract, calculation,
 drawing, meeting, spreadsheet, general) to route through type-specific
@@ -22,35 +22,39 @@ Document content (first 2000 chars):
 
 Reply with ONLY the category name, nothing else."""
 
+TYPE_MAP = {
+    "proposal": DocumentType.PROPOSAL,
+    "contract": DocumentType.CONTRACT,
+    "calculation": DocumentType.CALCULATION,
+    "drawing": DocumentType.DRAWING,
+    "meeting": DocumentType.MEETING,
+    "spreadsheet": DocumentType.SPREADSHEET,
+}
+
 
 async def classify_document(content: str) -> DocumentType:
     """Classify document content into a DocumentType.
 
-    Uses Gemini Flash for classification (~$0.001 per document).
+    Uses Claude Haiku for classification (fast + cheap).
     Falls back to GENERAL if classification fails.
     """
-    if not settings.llm_api_key:
+    api_key = settings.anthropic_api_key or settings.llm_api_key
+    if not api_key:
         return DocumentType.GENERAL
 
     try:
-        import google.generativeai as genai
+        import anthropic
 
-        genai.configure(api_key=settings.llm_api_key)
-        model = genai.GenerativeModel("gemini-2.0-flash")
-
+        client = anthropic.Anthropic(api_key=api_key)
         prompt = CLASSIFICATION_PROMPT.format(content=content[:2000])
-        response = model.generate_content(prompt)
-        result = response.text.strip().lower()
 
-        type_map = {
-            "proposal": DocumentType.PROPOSAL,
-            "contract": DocumentType.CONTRACT,
-            "calculation": DocumentType.CALCULATION,
-            "drawing": DocumentType.DRAWING,
-            "meeting": DocumentType.MEETING,
-            "spreadsheet": DocumentType.SPREADSHEET,
-        }
-        return type_map.get(result, DocumentType.GENERAL)
+        message = client.messages.create(
+            model="claude-haiku-4-5-20251001",
+            max_tokens=20,
+            messages=[{"role": "user", "content": prompt}],
+        )
+        result = message.content[0].text.strip().lower()
+        return TYPE_MAP.get(result, DocumentType.GENERAL)
 
     except Exception:
         return DocumentType.GENERAL
