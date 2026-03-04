@@ -8,7 +8,14 @@ from app.config import settings
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup: configure Cognee
+    # Create tables (dev mode — in prod use alembic migrate)
+    from app.database import Base, engine
+    from app.models import connector, document, note, user  # noqa: F401
+
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+    # Configure Cognee
     from app.services.knowledge import configure_cognee
 
     await configure_cognee()
