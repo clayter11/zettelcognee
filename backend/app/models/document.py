@@ -2,8 +2,8 @@ import uuid
 from datetime import datetime
 from enum import Enum as PyEnum
 
-from sqlalchemy import DateTime, Enum, Integer, String, Text, func
-from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
+from sqlalchemy import JSON, DateTime, Enum, Integer, String, Text, func
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -38,8 +38,8 @@ class Document(Base):
     storage_path: Mapped[str] = mapped_column(String(1000))  # GCS path
     doc_type: Mapped[DocumentType] = mapped_column(Enum(DocumentType), default=DocumentType.GENERAL)
     status: Mapped[DocumentStatus] = mapped_column(Enum(DocumentStatus), default=DocumentStatus.UPLOADED)
-    tags: Mapped[list[str] | None] = mapped_column(ARRAY(String))
-    metadata_extra: Mapped[dict | None] = mapped_column(JSONB)
+    tags: Mapped[list[str] | None] = mapped_column(JSON)
+    metadata_extra: Mapped[dict | None] = mapped_column(JSON)
     error_message: Mapped[str | None] = mapped_column(Text)
     uploaded_by: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

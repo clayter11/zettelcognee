@@ -1,8 +1,8 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, ForeignKey, String, Text, func
-from sqlalchemy.dialects.postgresql import ARRAY, UUID
+from sqlalchemy import JSON, DateTime, ForeignKey, String, Text, func
+from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.database import Base
@@ -16,7 +16,7 @@ class UserNote(Base):
     content: Mapped[str] = mapped_column(Text)  # markdown
     source_type: Mapped[str | None] = mapped_column(String(20))  # 'document', 'audio', 'chat', 'manual'
     source_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True))
-    tags: Mapped[list[str] | None] = mapped_column(ARRAY(String))
+    tags: Mapped[list[str] | None] = mapped_column(JSON)
     created_by: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id"))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), onupdate=func.now())

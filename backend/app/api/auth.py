@@ -4,9 +4,9 @@ from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from jose import JWTError, jwt
+import bcrypt
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from passlib.context import CryptContext
+from jose import JWTError, jwt
 from pydantic import BaseModel, EmailStr
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -16,8 +16,15 @@ from app.database import get_db
 from app.models.user import User
 
 router = APIRouter()
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login")
+
+
+def hash_password(password: str) -> str:
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt()).decode()
+
+
+def verify_password(password: str, hashed: str) -> bool:
+    return bcrypt.checkpw(password.encode(), hashed.encode())
 
 
 class UserCreate(BaseModel):
@@ -74,7 +81,7 @@ async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
 
     user = User(
         email=data.email,
-        hashed_password=pwd_context.hash(data.password),
+        hashed_password=hash_password(data.password),
         full_name=data.full_name,
     )
     db.add(user)
@@ -87,7 +94,7 @@ async def register(data: UserCreate, db: AsyncSession = Depends(get_db)):
 async def login(form: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(get_db)):
     result = await db.execute(select(User).where(User.email == form.username))
     user = result.scalar_one_or_none()
-    if not user or not pwd_context.verify(form.password, user.hashed_password):
+    if not user or not verify_password(form.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     return TokenResponse(access_token=create_token(user.id))
