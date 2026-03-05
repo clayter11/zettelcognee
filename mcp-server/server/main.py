@@ -20,7 +20,7 @@ import httpx
 from mcp.server.fastmcp import FastMCP
 
 API_URL = os.environ.get("ZETTELCOGNEE_API_URL", "http://localhost:8000")
-API_EMAIL = os.environ.get("ZETTELCOGNEE_EMAIL", "dev@zettelcognee.local")
+API_EMAIL = os.environ.get("ZETTELCOGNEE_EMAIL", "dev@zettelcognee.com")
 API_PASSWORD = os.environ.get("ZETTELCOGNEE_PASSWORD", "dev123")
 
 mcp = FastMCP("ZettelCognee")
