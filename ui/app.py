@@ -25,7 +25,7 @@ def ensure_auth():
 
     # Try login first
     resp = client.post("/api/auth/login", data={
-        "username": "dev@zettelcognee.local",
+        "username": "dev@zettelcognee.com",
         "password": "dev123",
     })
     if resp.status_code == 200:
@@ -34,13 +34,13 @@ def ensure_auth():
 
     # Register dev user
     resp = client.post("/api/auth/register", json={
-        "email": "dev@zettelcognee.local",
+        "email": "dev@zettelcognee.com",
         "password": "dev123",
         "full_name": "Dev User",
     })
     if resp.status_code == 201:
         resp = client.post("/api/auth/login", data={
-            "username": "dev@zettelcognee.local",
+            "username": "dev@zettelcognee.com",
             "password": "dev123",
         })
         st.session_state.token = resp.json()["access_token"]
