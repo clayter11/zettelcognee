@@ -23,10 +23,7 @@ API_URL = os.environ.get("ZETTELCOGNEE_API_URL", "http://localhost:8000")
 API_EMAIL = os.environ.get("ZETTELCOGNEE_EMAIL", "dev@zettelcognee.local")
 API_PASSWORD = os.environ.get("ZETTELCOGNEE_PASSWORD", "dev123")
 
-mcp = FastMCP(
-    "ZettelCognee",
-    description="Corporate knowledge base — search documents, meetings, notes via GraphRAG",
-)
+mcp = FastMCP("ZettelCognee")
 
 _token: str | None = None
 
